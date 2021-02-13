@@ -30,28 +30,28 @@ app.get("/stats", (req, res)=> {
     res.sendFile(path.join(__dirname, "./public/stats.html"));
 });
 
-app.get("/api/workouts", (req, res)=> {
-    Workout.find()
-    .then(dbWorkout => {
-        res.json(dbWorkout);
-      })
-      .catch(err => {
-        res.json(err);
-      });
+app.get("/api/workouts/", (req, res)=> {
+  db.Workout.find({})
+  db.Workout.aggregate([
+    {
+      "$addFields": {
+        "totalDuration": {
+          "$sum": "$exercises.duration",
+        },
+      },
+    },
+  ])
+  .sort({ date: -1 })
+    .then((dbWorkout) => {
+      res.json(dbWorkout);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
 });
-
-// app.put("/api/workouts/" + id, (req, res)=> {
-//     Workout.update()
-//     .then(dbWorkout => {
-//         res.json(dbWorkout);
-//       })
-//       .catch(err => {
-//         res.json(err);
-//       });
-// });
 
 app.post("/api/workouts/", (req, res)=> {
-    Workout.create()
+    db.Workout.create({})
     .then(dbWorkout => {
         res.json(dbWorkout);
       })
@@ -60,41 +60,57 @@ app.post("/api/workouts/", (req, res)=> {
       });
 });
 
-// app.post("/submit", ({ body }, res) => {
-//   User.create(body)
-//     .then(dbUser => {
-//       res.json(dbUser);
-//     })
-//     .catch(err => {
-//       res.json(err);
-//     });
-// });
+app.get("/api/workouts/range", (req, res) => {
+  db.Workout.find({})
+  db.Workout.aggregate([
+    {
+      "$addFields": {
+        "totalDuration": {
+          "$sum": "$exercises.duration",
+        },
+      },
+    },
+  ])
+    .then((dbWorkout) => {
+      res.json(dbWorkout);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+});
 
-app.post("/update/:id", (req, res) => {
-    db.notes.update(
-      {
-        _id: mongojs.ObjectId(req.params.id)
-      },
-      {
-        $set: {
-          title: req.body.title,
-          note: req.body.note,
-          modified: Date.now()
-        }
-      },
-      (error, data) => {
-        if (error) {
-          res.send(error);
-        } else {
-          res.send(data);
-        }
-      }
-    );
-  });
+app.post("/api/workouts/range", (req, res) => {
+  db.Workout.create({})
+    .then((dbWorkout) => {
+      res.json(dbWorkout);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+});
+
+
+app.put("/api/workouts/:id", (req, res) => {
+  db.Workout.findByIdAndUpdate(
+    req.params.id,
+    {
+      $push: { exercises: req.body },
+    },
+    {
+      new: true,
+    }
+  )
+    .then((dbWorkout) => {
+      res.json(dbWorkout);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+});
 
 
 app.listen(PORT, () => {
-  console.log(`App running on port ${PORT}!`);
+  console.log(`App running on port http://localhost:${PORT}`);
 });
 
 
