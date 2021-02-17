@@ -3,7 +3,7 @@ const logger = require("morgan");
 const mongoose = require("mongoose");
 
 const path = require("path");
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 const Workout = require("./models/workout.js");
 const app = express();
@@ -15,7 +15,7 @@ app.use(express.json());
 
 app.use(express.static("public"));
 
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/Workout", { useNewUrlParser: true, useFindAndModify: false });
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/workout", { useNewUrlParser: true, useFindAndModify: false, useUnifiedTopology: true });
 
 
 app.get("/", (req, res)=> {
@@ -31,8 +31,8 @@ app.get("/stats", (req, res)=> {
 });
 
 app.get("/api/workouts/", (req, res)=> {
-  db.Workout.find({})
-  db.Workout.aggregate([
+
+  Workout.aggregate([
     {
       "$addFields": {
         "totalDuration": {
@@ -41,8 +41,9 @@ app.get("/api/workouts/", (req, res)=> {
       },
     },
   ])
-  .sort({ date: -1 })
+  // .sort({ date: -1 })
     .then((dbWorkout) => {
+      console.log(dbWorkout);
       res.json(dbWorkout);
     })
     .catch((err) => {
@@ -51,7 +52,7 @@ app.get("/api/workouts/", (req, res)=> {
 });
 
 app.post("/api/workouts/", (req, res)=> {
-    db.Workout.create({})
+    Workout.create({})
     .then(dbWorkout => {
         res.json(dbWorkout);
       })
@@ -61,8 +62,8 @@ app.post("/api/workouts/", (req, res)=> {
 });
 
 app.get("/api/workouts/range", (req, res) => {
-  db.Workout.find({})
-  db.Workout.aggregate([
+  // Workout.find({})
+  Workout.aggregate([
     {
       "$addFields": {
         "totalDuration": {
@@ -79,19 +80,10 @@ app.get("/api/workouts/range", (req, res) => {
     });
 });
 
-app.post("/api/workouts/range", (req, res) => {
-  db.Workout.create({})
-    .then((dbWorkout) => {
-      res.json(dbWorkout);
-    })
-    .catch((err) => {
-      res.json(err);
-    });
-});
 
 
 app.put("/api/workouts/:id", (req, res) => {
-  db.Workout.findByIdAndUpdate(
+  Workout.findByIdAndUpdate(
     req.params.id,
     {
       $push: { exercises: req.body },
