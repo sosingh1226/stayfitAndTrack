@@ -14,7 +14,7 @@ A consumer will reach their fitness goals more quickly when they track their wor
 (https://github.com/sosingh1226/stayfitAndTrack)
 
 * Deployed Heroku Link: 
-(https://burger-drama.herokuapp.com/)
+(https://stayfitandtrack.herokuapp.com/?id=602f53cd10ee371af35637d8)
 
 
 ## Challenges
