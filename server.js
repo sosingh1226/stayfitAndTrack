@@ -1,6 +1,7 @@
 const express = require("express");
 const logger = require("morgan");
 const mongoose = require("mongoose");
+require("dotenv").config();
 
 const path = require("path");
 const PORT = process.env.PORT || 4000;
@@ -20,7 +21,7 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/workout",
   useUnifiedTopology: true,
   useCreateIndex: true,
   useFindAndModify: false
-});
+}).then(()=>console.log("connected", process.env.MONGODB_URI)).catch(err=>console.log(err));
 
 app.get("/", (req, res)=> {
     res.sendFile(path.join(__dirname, "./public/index.html"));
